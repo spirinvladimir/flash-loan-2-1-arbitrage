@@ -13,6 +13,7 @@
     "hardhat": "^2.19.0"
   },
   "dependencies": {
-    "@aave/core-v3": "^1.19.3"
+    "@aave/core-v3": "^1.19.3",
+    "@openzeppelin/contracts": "^5.4.0"
   }
 }
