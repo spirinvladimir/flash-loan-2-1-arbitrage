@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Triangular arbitrage between 2 pools at same exchange. Flash loan based.",
   "main": "index.js",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
