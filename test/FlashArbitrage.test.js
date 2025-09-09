@@ -14,7 +14,7 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
   const UNISWAP_V3_FACTORY = "0x0227628f3F023bb0B980b67D528571c95c6DaC1c"
   const UNISWAP_V3_POSITION_MANAGER = "0x1238536071E1c677A632429e3655c799b22cDA52"
 
-  beforeAll(async function () {
+  before(async function () {
     [owner, addr1] = await ethers.getSigners()
 
     console.log("Running on Sepolia testnet")
