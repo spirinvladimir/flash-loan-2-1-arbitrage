@@ -1,14 +1,14 @@
-name: Test Flash Arbitrage on Sepolia
+name: Test Flash Arbitrage
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, master ]
-  workflow_dispatch: # Allows manual triggering
+    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
-  test-sepolia:
+  test:
     runs-on: ubuntu-latest
     
     steps:
@@ -18,7 +18,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '22'
         cache: 'npm'
         
     - name: Install dependencies
@@ -27,12 +27,8 @@ jobs:
     - name: Compile contracts
       run: npx hardhat compile
       
-    - name: Run tests on Sepolia
+    - name: Run tests
       run: npx hardhat test --network sepolia
       env:
         SEPOLIA_URL: ${{ secrets.SEPOLIA_URL }}
         PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-        
-    - name: Test summary
-      if: always()
-      run: echo "Sepolia testnet execution completed"
