@@ -10,6 +10,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      SEPOLIA_URL: ${{ secrets.SEPOLIA_URL }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
 
     steps:
     - name: Checkout code
@@ -29,6 +32,3 @@ jobs:
 
     - name: Run tests
       run: npm test
-      env:
-        SEPOLIA_URL: ${{ secrets.SEPOLIA_URL }}
-        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
