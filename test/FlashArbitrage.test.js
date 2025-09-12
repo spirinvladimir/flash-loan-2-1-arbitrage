@@ -21,8 +21,6 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
     console.log("First signer:", signers[0])
 
     if (signers.length === 0) {
-        console.log('SEPOLIA_URL', process.env.SEPOLIA_URL)
-        console.log('PRIVATE_KEY', process.env.PRIVATE_KEY)
       throw new Error("No signers available. Make sure PRIVATE_KEY environment variable is set.")
     }
 
@@ -32,21 +30,12 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
     console.log("Running on Sepolia testnet")
     console.log("Owner address:", owner.address)
 
-    // Deploy test tokens A, B, C
+    // Deploy test tokens B, C
     console.log("Deploying test tokens...")
     const TestToken = await ethers.getContractFactory("TestToken")
 
-    tokenA = await TestToken.deploy("Token A", "A", 1000000, owner.address)
-    await tokenA.waitForDeployment()
-    console.log("Token A deployed to:", tokenA.target)
-
-    tokenB = await TestToken.deploy("Token B", "B", 1000000, owner.address)
-    await tokenB.waitForDeployment()
-    console.log("Token B deployed to:", tokenB.target)
-
-    tokenC = await TestToken.deploy("Token C", "C", 1000000, owner.address)
-    await tokenC.waitForDeployment()
-    console.log("Token C deployed to:", tokenC.target)
+    tokenB = await ethers.getContractAt("B", '0x37DCB6a330BFF5e9829b69d4d5f0d41d47F94B82')
+    tokenC = await ethers.getContractAt("C", '0x66f82D2c452190E168328189FE582b588577e0d2')
 
     // Get Uniswap contracts
     uniswapV2Factory = await ethers.getContractAt("IUniswapV2Factory", UNISWAP_V2_FACTORY)
@@ -54,33 +43,34 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
     uniswapV3Factory = await ethers.getContractAt("IUniswapV3Factory", UNISWAP_V3_FACTORY)
     uniswapV3PositionManager = await ethers.getContractAt("INonfungiblePositionManager", UNISWAP_V3_POSITION_MANAGER)
 
+    const weth = await ethers.getContractAt("IWETH", '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14')
     // Approve tokens for Uniswap routers
-    const approveAmount = ethers.parseEther("1000000")
-    await tokenA.approve(UNISWAP_V2_ROUTER, approveAmount)
+    const approveAmount = ethers.parseEther("0.3")
+    await weth.approve(UNISWAP_V2_ROUTER, approveAmount)
     await tokenB.approve(UNISWAP_V2_ROUTER, approveAmount)
     await tokenC.approve(UNISWAP_V2_ROUTER, approveAmount)
-    await tokenA.approve(UNISWAP_V3_POSITION_MANAGER, approveAmount)
+    await weth.approve(UNISWAP_V3_POSITION_MANAGER, approveAmount)
     await tokenC.approve(UNISWAP_V3_POSITION_MANAGER, approveAmount)
 
-    // Create Uniswap V2 pools [A,B] and [B,C]
+    // Create Uniswap V2 pools [WETH,B] and [B,C]
     console.log("Creating Uniswap V2 pools...")
-    console.log("Token A address:", tokenA.target)
+    console.log("Token WETH address:", weth.target)
     console.log("Token B address:", tokenB.target)
     console.log("Token C address:", tokenC.target)
 
-    // Create pair A-B
+    // Create pair WETH-B
     try {
-      console.log("Creating pair A-B...")
-      const createTxAB = await uniswapV2Factory.createPair(tokenA.target, tokenB.target)
-      const receiptAB = await createTxAB.wait()
-      console.log("Create pair A-B transaction status:", receiptAB.status)
-      console.log("Create pair A-B gas used:", receiptAB.gasUsed.toString())
+      console.log("Creating pair WETH-B...")
+      const createTxWETHB = await uniswapV2Factory.createPair(weth.target, tokenB.target)
+      const receiptWETHB = await createTxWETHB.wait()
+      console.log("Create pair WETH-B transaction status:", receiptWETHB.status)
+      console.log("Create pair WETH-B gas used:", receiptWETHB.gasUsed.toString())
     } catch (error) {
-      console.log("Error creating pair A-B:", error.message)
+      console.log("Error creating pair WETH-B:", error.message)
     }
-    
-    const pairAB = await uniswapV2Factory.getPair(tokenA.target, tokenB.target)
-    console.log("Uniswap V2 pair A-B created at:", pairAB)
+
+    const pairWETHB = await uniswapV2Factory.getPair(weth.target, tokenB.target)
+    console.log("Uniswap V2 pair WETH-B created at:", pairWETHB)
 
     // Create pair B-C
     try {
@@ -92,16 +82,16 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
     } catch (error) {
       console.log("Error creating pair B-C:", error.message)
     }
-    
+
     const pairBC = await uniswapV2Factory.getPair(tokenB.target, tokenC.target)
     console.log("Uniswap V2 pair B-C created at:", pairBC)
 
     // Add liquidity to V2 pools
-    const liquidityAmount = ethers.parseEther("10000")
+    const liquidityAmount = ethers.parseEther("0.14")
     const deadline = Math.floor(Date.now() / 1000) + 3600
 
     await uniswapV2Router.addLiquidity(
-      tokenA.target,
+      weth.target,
       tokenB.target,
       liquidityAmount,
       liquidityAmount,
@@ -110,7 +100,7 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
       owner.address,
       deadline
     )
-    console.log("Liquidity added to V2 pool A-B")
+    console.log("Liquidity added to V2 pool WETH-B")
 
     await uniswapV2Router.addLiquidity(
       tokenB.target,
@@ -124,21 +114,21 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
     )
     console.log("Liquidity added to V2 pool B-C")
 
-    // Create Uniswap V3 pool [A,C]
-    console.log("Creating Uniswap V3 pool A-C...")
+    // Create Uniswap V3 pool [WETH,C]
+    console.log("Creating Uniswap V3 pool WETH-C...")
     const fee = 3000 // 0.3%
-    
+
     // Sort token addresses (token0 must be < token1)
     let token0, token1
-    if (tokenA.target < tokenC.target) {
-      token0 = tokenA.target
+    if (weth.target < tokenC.target) {
+      token0 = weth.target
       token1 = tokenC.target
     } else {
       token0 = tokenC.target
-      token1 = tokenA.target
+      token1 = weth.target
     }
     console.log("Sorted tokens - token0:", token0, "token1:", token1)
-    
+
     try {
       console.log("Creating V3 pool...")
       const createPoolTx = await uniswapV3Factory.createPool(token0, token1, fee)
@@ -148,14 +138,14 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
     } catch (error) {
       console.log("Error creating V3 pool:", error.message)
     }
-    
-    const poolAC_V3 = await uniswapV3Factory.getPool(token0, token1, fee)
-    console.log("Uniswap V3 pool A-C created at:", poolAC_V3)
 
-    // Initialize V3 pool price (1.5:1 ratio, A/C = 1.5)
-    const pool = await ethers.getContractAt("IUniswapV3Pool", poolAC_V3)
+    const poolWETHC_V3 = await uniswapV3Factory.getPool(token0, token1, fee)
+    console.log("Uniswap V3 pool WETH-C created at:", poolWETHC_V3)
+
+    // Initialize V3 pool price (1.5:1 ratio, WETH/C = 1.5)
+    const pool = await ethers.getContractAt("IUniswapV3Pool", poolWETHC_V3)
     const sqrtPriceX96 = "97014204836101100663100142551" // sqrt(1.5) * 2^96
-    
+
     try {
       console.log("Initializing V3 pool with price...")
       await pool.initialize(sqrtPriceX96)
@@ -170,19 +160,19 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
     try {
       console.log("Adding liquidity to V3 pool...")
       // Calculate amounts based on which token is token0/token1 and pool price ratio
-      // Pool price ratio A/C = 1.5, so we need 1.5x more A than C
+      // Pool price ratio WETH/C = 1.5, so we need 1.5x more WETH than C
       let amount0Desired, amount1Desired
-      
-      if (token0 == tokenA.target) {
-        // token0 = A, token1 = C
-        amount0Desired = ethers.parseEther("15000")  // Token A (1.5x)
+
+      if (token0 == weth.target) {
+        // token0 = WETH, token1 = C
+        amount0Desired = ethers.parseEther("0.14")  // Token WETH (1.5x)
         amount1Desired = liquidityAmount             // Token C (base)
       } else {
-        // token0 = C, token1 = A  
+        // token0 = C, token1 = WETH
         amount0Desired = liquidityAmount             // Token C (base)
-        amount1Desired = ethers.parseEther("15000")  // Token A (1.5x)
+        amount1Desired = ethers.parseEther("0.14")  // Token WETH (1.5x)
       }
-      
+
       const mintParams = [
         token0,              // token0
         token1,              // token1
@@ -196,13 +186,13 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
         owner.address,       // recipient
         deadline             // deadline
       ]
-      
+
       await uniswapV3PositionManager.mint(mintParams)
       console.log("Liquidity added to V3 pool successfully")
     } catch (error) {
       console.log("Error adding liquidity to V3 pool:", error.message)
     }
-    console.log("Liquidity added to V3 pool A-C")
+    console.log("Liquidity added to V3 pool WETH-C")
 
     // Deploy FlashArbitrage contract
     const FlashArbitrage = await ethers.getContractFactory("FlashArbitrage")
@@ -216,7 +206,7 @@ describe("Flash loan - 2/1 Arbitrage (Sepolia)", function () {
   describe("Sepolia Execute Function", function () {
     it("Should execute profitable arbitrage successfully", async function () {
       this.timeout(600000) // 10 minutes
-      const flashLoanAmount = ethers.parseEther("100") // 100 tokens
+      const flashLoanAmount = ethers.parseEther("0.01") // 0.01 tokens
 
       console.log("Attempting to execute flash loan with amount:", ethers.formatEther(flashLoanAmount), "tokens")
 
