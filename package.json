@@ -7,13 +7,13 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "env": "SEPOLIA_URL=https://sepolia.infura.io/v3/2fae074bea8c49d1bc9836a80b3f3452 PRIVATE_KEY=6883224f38095d43e2def96c21e315715532404068627e2bcfc2d4fdcd8ec50c",
-    "compile": "npm run env && hardhat compile",
-    "test": " npm run env && hardhat test --network sepolia",
-    "deploy": "npm run env && hardhat run scripts/deploy.js"
+    "compile": "hardhat compile",
+    "test": "hardhat test --network sepolia",
+    "deploy": "hardhat run scripts/deploy.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "dotenv": "^17.2.2",
     "hardhat": "^2.19.0"
   },
   "dependencies": {
