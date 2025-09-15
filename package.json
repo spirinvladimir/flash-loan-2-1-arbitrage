@@ -14,7 +14,8 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "dotenv": "^17.2.2",
-    "hardhat": "^2.19.0"
+    "hardhat": "^2.19.0",
+    "viem": "^2.37.5"
   },
   "dependencies": {
     "@aave/core-v3": "^1.19.3",

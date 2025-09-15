@@ -51,3 +51,6 @@ coverage/
 *.temp
 .tmp/
 .temp/
+
+# Data
+address_mapping/
