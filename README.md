@@ -1,74 +1,54 @@
-# ⚡ Flash Arbitrage Contract
+# flash arbitrage contract (cross protocol)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](https://opensource.org/licenses/MIT)
 [![Solidity](https://img.shields.io/badge/Solidity-%5E0.8.0-black.svg)](https://docs.soliditylang.org/)
 [![Network](https://img.shields.io/badge/Network-Ethereum-black.svg)](https://ethereum.org/)
 [![AAVE](https://img.shields.io/badge/Flash%20Loans-AAVE-black.svg)](https://aave.com/)
 
-## 🎯 Overview
+## overview
 
-High-efficiency arbitrage contract exploiting price differences across decentralized exchanges using AAVE flash loans. The contract executes triangular arbitrage between two DEX platforms in a single atomic transaction.
+high-efficiency arbitrage analysis toolkit for detecting profitable flash loan opportunities across decentralized exchanges.
+the system identifies triangular arbitrage paths where price discrepancies between dex platforms create risk-free profit.
 
-## 🔄 Arbitrage Flow
+## core concept
+
+arbitrage circle strategy between two protocols:
 
 ```
-🏦 AAVE Flash Loan
-     ↓
-💱 DEX A: Pool 1 → Pool 2  
-     ↓
-💱 DEX B: Pool 3
-     ↓
-💰 Profit Extraction
-     ↓
-🔄 Flash Loan Repayment
+dex_1: [token A <-> token B] + [token B <-> token C]
+dex_2: [token A <-> token C]
+
+key: dex_1 has A-B and B-C pools but no A-C pool
+     dex_2 has A-C pool completing the triangle
 ```
 
-## ⚙️ Architecture
+## execution strategy
 
-### Core Concept
-- **Two pools** on DEX A connected by a shared token
-- **Third pool** on DEX B containing the disconnected token pair
-- **Arbitrage opportunity** emerges from price discrepancies between exchanges
+1. **flash loan**: borrow token A from aave with zero capital
+2. **path trading**: execute A→B→C through connected pools on dex_1
+3. **direct swap**: convert C→A on dex_2 at different rate
+4. **profit extraction**: repay loan + fees, keep difference
 
-### Exchange Topology
-```
-DEX A: [Token X ↔ Token Y] + [Token Y ↔ Token Z]
-DEX B: [Token X ↔ Token Z]
-```
+## optimization approach
 
-When `DEX A(X→Y→Z) ≠ DEX B(X→Z)`, profitable arbitrage exists.
+### pool filtering
+- pre-filter pools by aave token availability (only flashloanable tokens)
+- binary format for fast lookups (3 ints per pool combination)
+- eliminate pools with insufficient liquidity early
 
-## 🚀 Execution Strategy
+### combination analysis
+- generate all possible 2-pool and 3-pool paths
+- index tokens for o(1) lookups instead of string comparisons
+- store only profitable combinations after simulation
 
-1. **Flash Loan Initiation**: Borrow Token X from AAVE
-2. **DEX A Trading**: Execute X→Y→Z conversion through connected pools
-3. **DEX B Trading**: Convert Z back to X at different rate
-4. **Profit Realization**: Extract arbitrage profit
-5. **Loan Settlement**: Repay flash loan + fees
+### performance considerations
+- dynamic pool lookup for maximum flexibility
+- atomic execution in single transaction
+- gas optimization through minimal storage operations
+- pre-validated paths eliminate runtime checks
 
-## 📋 Technical Specifications
+## data pipeline
 
-### Key Features
-- ⚡ **Zero Capital Required**: Utilizes AAVE flash loans
-- 🎯 **Atomic Execution**: All operations in single transaction
-- 💎 **Gas Optimized**: Minimal codebase for maximum efficiency
-- 🔒 **Hardcoded Addresses**: Pre-validated pool addresses for optimal performance
+raw pool data → token indexing → combination generation → aave filtering → profitability analysis → contract generation
 
-## 🛡️ Safety Considerations
-
-The contract operates under these assumptions:
-- Pool addresses are pre-validated and hardcoded
-- Arbitrage opportunities are detected off-chain
-- Contract execution is profit-guaranteed before deployment
-- No runtime address validation for gas efficiency
-
-## 📊 Performance Metrics
-
-- **Memory Usage**: Minimized through elimination of extra collections
-- **Time Complexity**: Linear execution path without redundant loops
-- **Gas Efficiency**: Direct execution without intermediate checks
-- **Code Footprint**: Maximum function reusability (2+ consumers per function)
-
----
-
-*Built for high-frequency arbitrage with institutional-grade efficiency standards.*
+the system processes millions of pool combinations to identify the few hundred profitable paths worth deploying.
