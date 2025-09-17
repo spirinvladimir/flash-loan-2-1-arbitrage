@@ -1,5 +1,5 @@
 fs = require('fs')
-pool_array = require('./address_mapping/4_pools.json')
+pool_array = require('./data/4_pools.json')
 const { createPublicClient, http, formatUnits } = require('viem')
 const { mainnet } = require('viem/chains')
 const client = createPublicClient({
@@ -64,7 +64,7 @@ pool_array.reduce((promise_chain, chunk, chunk_index) =>
         })
     }), promise_chain), Promise.resolve())
   .then(() => {
-    console.log('Saved ./address_mapping/4_pools_reserves.json')
-    fs.writeFileSync('./address_mapping/4_pools_reserves.json', JSON.stringify(pool_array), 'utf8')
+    console.log('Saved ./data/4_pools_reserves.json')
+    fs.writeFileSync('./data/4_pools_reserves.json', JSON.stringify(pool_array), 'utf8')
   })
   .catch(error => console.error('Error processing array:', error))

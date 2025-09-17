@@ -1,5 +1,5 @@
 fs = require('fs')
-token_array = require('./address_mapping/4_tokens.json')
+token_array = require('./data/4_tokens.json')
 const { createPublicClient, http } = require('viem')
 const { mainnet } = require('viem/chains')
 
@@ -56,7 +56,7 @@ token_array.reduce((promise_chain, current_item, i) =>
       })
   }), Promise.resolve())
   .then(() => {
-    console.log('Saved ./address_mapping/4_tokens.json')
-    fs.writeFileSync('./address_mapping/4_tokens.json', JSON.stringify(token_array), 'utf8')
+    console.log('Saved ./data/4_tokens.json')
+    fs.writeFileSync('./data/4_tokens.json', JSON.stringify(token_array), 'utf8')
   })
   .catch(error => console.error('Error processing array:', error))

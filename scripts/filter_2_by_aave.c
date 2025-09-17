@@ -28,9 +28,9 @@ const char* get_address_by_index(int index) {
 
 int main() {
     // Load tokens.json
-    FILE *tokens_file = fopen("address_mapping/tokens.json", "r");
+    FILE *tokens_file = fopen("data/tokens.json", "r");
     if (tokens_file == NULL) {
-        printf("Error: Cannot open address_mapping/tokens.json\n");
+        printf("Error: Cannot open data/tokens.json\n");
         return 1;
     }
 
@@ -59,7 +59,7 @@ int main() {
     fclose(fin);
     printf("Loaded %d AAVE token indexes\n", aave_count);
 
-    FILE *f3 = fopen("address_mapping/2_pools.bin", "rb");
+    FILE *f3 = fopen("data/2_pools.bin", "rb");
     fseek(f3, 0, SEEK_END);
     long f3_size = ftell(f3);
     int total = f3_size / (3 * sizeof(int));
@@ -68,7 +68,7 @@ int main() {
     fread(combs3, sizeof(int[3]), total, f3);
     fclose(f3);
     int filtered_count = 0;
-    FILE *fout = fopen("address_mapping/2_pools_filtered_aave.bin", "wb");
+    FILE *fout = fopen("data/2_pools_filtered_aave.bin", "wb");
 
     // Create JSON array for the mapping
     cJSON *json_output = cJSON_CreateArray();
@@ -111,7 +111,7 @@ int main() {
     fclose(fout);
 
     // Write JSON output to file
-    FILE *json_file = fopen("address_mapping/2_pools_filtered_aave.json", "w");
+    FILE *json_file = fopen("data/2_pools_filtered_aave.json", "w");
     char *json_string = cJSON_Print(json_output);
     fprintf(json_file, "%s", json_string);
     fclose(json_file);

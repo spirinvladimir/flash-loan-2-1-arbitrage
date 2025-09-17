@@ -53,7 +53,7 @@ coverage/
 .temp/
 
 # Data
-address_mapping/
+data/
 scripts/aave_tokens_indexes.bin
 
 # Build programs

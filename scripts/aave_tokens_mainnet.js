@@ -3,7 +3,7 @@ const { mainnet } = require('viem/chains')
 const fs = require('fs')
 
 const pool = '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2'
-const fn = 'address_mapping/aave_tokens_mainnet.json'
+const fn = 'data/aave_tokens_mainnet.json'
 
 createPublicClient({
   chain: mainnet,
