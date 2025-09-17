@@ -1,6 +1,6 @@
 fs = require('fs')
-pools = require('./address_mapping/pools_and_tokens.json').pairs
-tokens = require('./address_mapping/4_tokens.json')
+pools = require('./data/pools_and_tokens.json').pairs
+tokens = require('./data/4_tokens.json')
 const b = fs.readFileSync('4_tokens.bin')
 
 const show_progress = (current, total) => {
@@ -98,5 +98,5 @@ for (var i = 0, A, B, C, D, AB, BD, CD, AC; i < a.length; i += 4) {
 }
 console.log('Wrong combs', wrong_combs)
 console.log('Good combs', result.length)
-fs.writeFileSync('./address_mapping/4_pools.json', JSON.stringify(result), 'utf8')
-console.log('4 pools combs saved at: ./address_mapping/4_pools.json')
+fs.writeFileSync('./data/4_pools.json', JSON.stringify(result), 'utf8')
+console.log('4 pools combs saved at: ./data/4_pools.json')

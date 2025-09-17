@@ -1,4 +1,4 @@
-combs = require('./address_mapping/4_good_pools.json')
+combs = require('./data/4_good_pools.json')
 const start_amount = 100;
 
 combs.forEach((comb, idx) => {

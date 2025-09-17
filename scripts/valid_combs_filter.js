@@ -1,4 +1,4 @@
-combs = require('./address_mapping/4_pools_reserves.json')
+combs = require('./data/4_pools_reserves.json')
 
 combs = combs.filter(comb =>
     comb.every(pool =>
@@ -11,4 +11,4 @@ combs = combs.filter(comb =>
     )
 )
 
-require('fs').writeFileSync('./address_mapping/4_good_pools.json', JSON.stringify(combs))
+require('fs').writeFileSync('./data/4_good_pools.json', JSON.stringify(combs))

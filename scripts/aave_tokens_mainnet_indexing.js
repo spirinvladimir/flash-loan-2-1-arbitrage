@@ -1,6 +1,6 @@
 const fs = require('fs')
-const tokens = require('./address_mapping/tokens.json')
-const aave = require('./aave_tokens_mainnet.json')
+const tokens = require('./data/tokens.json')
+const aave = require('./data/aave_tokens_mainnet.json')
 let indexes = Array(aave.length).fill(null)
 
 for (var i = 0; i < tokens.length; i++)

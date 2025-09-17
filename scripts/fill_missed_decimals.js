@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { createPublicClient, http } = require('viem');
 const { mainnet } = require('viem/chains');
-const combs = require('./address_mapping/4_pools_reserves.json');
+const combs = require('./data/4_pools_reserves.json');
 
 const client = createPublicClient({
   chain: mainnet,
@@ -40,7 +40,7 @@ combs.reduce((chain, comb, i) =>
   , chain)
 , Promise.resolve())
 .then(() => {
-    fs.writeFileSync('./address_mapping/4_pools_reserves.json', JSON.stringify(combs), 'utf8')
+    fs.writeFileSync('./data/4_pools_reserves.json', JSON.stringify(combs), 'utf8')
     console.log('All decimal values updated');
     console.log('Process completed');
 })
