@@ -58,5 +58,3 @@ scripts/aave_tokens_indexes.bin
 
 # Build programs
 scripts/filter_2_by_aave
-scripts/most_connected.js
-scripts/protocol_combinations.js
