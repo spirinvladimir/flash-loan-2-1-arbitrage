@@ -58,3 +58,6 @@ scripts/aave_tokens_indexes.bin
 
 # Build programs
 scripts/filter_2_by_aave
+
+protocol_combinations.js
+entry_token_set.js
